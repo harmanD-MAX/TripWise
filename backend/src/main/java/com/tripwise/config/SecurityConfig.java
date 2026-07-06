@@ -23,9 +23,7 @@ public class SecurityConfig {
             .cors(Customizer.withDefaults())
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(authz -> authz
-                // Public endpoints
                 .requestMatchers("/", "/api/public/**", "/actuator/health", "/api/search", "/api/weather", "/uploads/**").permitAll()
-                // All other endpoints require authentication
                 .anyRequest().authenticated()
             )
             .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));

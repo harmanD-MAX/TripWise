@@ -35,10 +35,9 @@ public class RoutePlannerService {
 
         List<Activity> activities = day.getActivities();
         if (activities == null || activities.size() <= 2) {
-            return day; // Nothing to optimize
+            return day;
         }
 
-        // Try starting from every possible activity to find the absolute best route
         List<Activity> bestRoute = null;
         double bestDistance = Double.MAX_VALUE;
 
@@ -74,7 +73,6 @@ public class RoutePlannerService {
             }
         }
 
-        // Save the new order
         for (int i = 0; i < bestRoute.size(); i++) {
             bestRoute.get(i).setDisplayOrder(i);
         }
@@ -94,10 +92,9 @@ public class RoutePlannerService {
             double lat2 = Double.parseDouble(p2[0].trim());
             double lon2 = Double.parseDouble(p2[1].trim());
 
-            // Simple euclidean distance for demo purposes (Haversine is better but this works for local sorting)
             return Math.sqrt(Math.pow(lat1 - lat2, 2) + Math.pow(lon1 - lon2, 2));
         } catch (Exception e) {
-            return Double.MAX_VALUE; // Put invalid coords at the end
+            return Double.MAX_VALUE;
         }
     }
 }

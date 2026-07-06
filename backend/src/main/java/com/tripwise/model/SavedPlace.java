@@ -25,20 +25,19 @@ public class SavedPlace {
     private String name;
 
     @Column(name = "type")
-    private String type; // e.g., "Restaurant", "Attraction", "Hotel"
+    private String type;
 
     @Column(name = "description", length = 1000)
     private String description;
 
     @Column(name = "coordinates")
-    private String coordinates; // "lng,lat"
+    private String coordinates;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
     public SavedPlace() {}
 
-    // Getters and Setters
 
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }

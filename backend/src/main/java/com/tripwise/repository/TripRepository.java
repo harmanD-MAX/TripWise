@@ -36,4 +36,5 @@ public interface TripRepository extends JpaRepository<Trip, UUID> {
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("DELETE FROM Trip t WHERE t.id = :tripId")
     void deleteTripByTripId(@Param("tripId") UUID tripId);
+
 }

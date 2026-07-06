@@ -30,7 +30,6 @@ export default function SearchBar({ onSelectLocation }) {
       setLoading(true);
       try {
         const res = await api.get(`/api/search?q=${encodeURIComponent(query)}`);
-        // Nominatim returns stringified JSON array directly
         setResults(typeof res.data === 'string' ? JSON.parse(res.data) : res.data);
       } catch (err) {
         console.error("Search failed", err);

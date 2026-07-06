@@ -25,10 +25,10 @@ public class Activity {
     private String name;
 
     @Column(name = "type")
-    private String type; // e.g., "Restaurant", "Attraction", "Hotel"
+    private String type;
 
     @Column(name = "time")
-    private String time; // e.g., "10:00 AM"
+    private String time;
 
     @JsonProperty("cost_estimate")
     @Column(name = "cost_estimate")
@@ -38,14 +38,13 @@ public class Activity {
     private String notes;
 
     @Column(name = "coordinates")
-    private String coordinates; // Stored as "lng,lat" for Mapbox
+    private String coordinates;
 
     @Column(name = "display_order")
     private Integer displayOrder;
 
     public Activity() {}
 
-    // Getters and Setters
 
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }

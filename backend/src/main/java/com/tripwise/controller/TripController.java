@@ -93,6 +93,17 @@ public class TripController {
         }
     }
 
+    @PutMapping("/{id}/budget")
+    public ResponseEntity<Trip> updateBudget(@AuthenticationPrincipal Jwt jwt, @PathVariable UUID id, @RequestBody java.util.Map<String, String> payload) {
+        String clerkUserId = jwt.getSubject();
+        String budget = payload.get("budget");
+        try {
+            return ResponseEntity.ok(tripService.updateTripBudget(id, clerkUserId, budget));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(403).build();
+        }
+    }
+
     @PostMapping("/{id}/duplicate")
     public ResponseEntity<Trip> duplicateTrip(@AuthenticationPrincipal Jwt jwt, @PathVariable UUID id) {
         String clerkUserId = jwt.getSubject();

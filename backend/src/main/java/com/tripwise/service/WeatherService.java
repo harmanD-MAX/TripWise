@@ -12,16 +12,14 @@ import java.util.Random;
 @Service
 public class WeatherService {
 
-    // Simulates an external API call to a Weather provider (e.g., OpenWeatherMap)
     @Cacheable(value = "weather", key = "#destination.toLowerCase()")
     public Map<String, Object> getWeatherForecast(String destination) {
-        // Simulate network delay
         try { Thread.sleep(500); } catch (InterruptedException e) {}
 
         Map<String, Object> response = new HashMap<>();
         Random rand = new Random(destination.hashCode());
 
-        int currentTemp = 15 + rand.nextInt(15); // 15 to 30 C
+        int currentTemp = 15 + rand.nextInt(15);
         String[] conditions = {"Sunny", "Partly Cloudy", "Cloudy", "Rainy", "Clear"};
         String currentCondition = conditions[rand.nextInt(conditions.length)];
 

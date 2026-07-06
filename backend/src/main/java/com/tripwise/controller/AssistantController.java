@@ -18,9 +18,8 @@ public class AssistantController {
     private AssistantService assistantService;
 
     @PostMapping("/generate-itinerary")
-    public ResponseEntity<String> generateItinerary(@AuthenticationPrincipal Jwt jwt, @RequestBody Trip tripDetails) {
-        // We verify the user is authenticated, but generating an itinerary based on transient details doesn't require saving yet.
-        return ResponseEntity.ok(assistantService.generateItinerary(tripDetails));
+    public ResponseEntity<Trip> generateItinerary(@AuthenticationPrincipal Jwt jwt, @RequestBody Trip tripDetails) {
+        return ResponseEntity.ok(assistantService.generateItinerary(tripDetails, jwt.getSubject()));
     }
 
     @PostMapping("/ask")
@@ -39,5 +38,10 @@ public class AssistantController {
     @PostMapping("/optimize")
     public ResponseEntity<String> optimizeItinerary(@AuthenticationPrincipal Jwt jwt, @RequestBody Trip tripDetails) {
         return ResponseEntity.ok(assistantService.optimizeItinerary(tripDetails));
+    }
+
+    @PostMapping("/predict-budget/{tripId}")
+    public ResponseEntity<String> predictBudget(@AuthenticationPrincipal Jwt jwt, @PathVariable java.util.UUID tripId, @RequestBody Trip tripDetails) {
+        return ResponseEntity.ok(assistantService.predictBudget(tripId, tripDetails));
     }
 }

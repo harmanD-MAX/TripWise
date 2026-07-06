@@ -25,7 +25,7 @@ public class Expense {
     private Double amount;
 
     @Column(name = "category", nullable = false)
-    private String category; // Accommodation, Food, Transportation, Shopping, Activities, Other
+    private String category;
 
     @Column(name = "date")
     private LocalDate date;

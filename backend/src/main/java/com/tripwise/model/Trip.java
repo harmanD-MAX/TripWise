@@ -2,6 +2,8 @@ package com.tripwise.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -33,7 +35,7 @@ public class Trip {
     private LocalDate endDate;
 
     @Column(name = "budget")
-    private String budget; // e.g., "Moderate", "Luxury", "$2000"
+    private String budget;
 
     @Column(name = "travelers")
     private Integer travelers;
@@ -42,12 +44,15 @@ public class Trip {
     private String travelStyle;
 
     @OneToMany(mappedBy = "trip", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Fetch(FetchMode.SUBSELECT)
     private List<ItineraryDay> itineraryDays;
 
     @OneToMany(mappedBy = "trip", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Fetch(FetchMode.SUBSELECT)
     private List<Expense> expenses;
 
     @OneToMany(mappedBy = "trip", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Fetch(FetchMode.SUBSELECT)
     private List<TripMedia> tripMedia;
 
     @Column(name = "is_public")
@@ -59,9 +64,11 @@ public class Trip {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    @Column(name = "budget_prediction_json", columnDefinition = "TEXT")
+    private String budgetPredictionJson;
+
     public Trip() {}
 
-    // Getters and Setters
 
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }
@@ -104,4 +111,7 @@ public class Trip {
 
     public Boolean getIsTemplate() { return isTemplate; }
     public void setIsTemplate(Boolean isTemplate) { this.isTemplate = isTemplate; }
+
+    public String getBudgetPredictionJson() { return budgetPredictionJson; }
+    public void setBudgetPredictionJson(String budgetPredictionJson) { this.budgetPredictionJson = budgetPredictionJson; }
 }

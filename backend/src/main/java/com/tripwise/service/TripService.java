@@ -33,12 +33,11 @@ public class TripService {
     }
 
     public Trip createTrip(String clerkUserId, Trip tripData) {
-        // Ensure user exists, if not, create a basic record
         User user = userRepository.findById(clerkUserId)
                 .orElseGet(() -> {
                     User newUser = new User();
                     newUser.setId(clerkUserId);
-                    newUser.setEmail("unknown@clerk.user"); // Typically synced via webhooks in a real app
+                    newUser.setEmail("unknown@clerk.user");
                     return userRepository.save(newUser);
                 });
 
@@ -67,8 +66,18 @@ public class TripService {
         return tripRepository.save(trip);
     }
 
+    public Trip updateTripBudget(UUID tripId, String clerkUserId, String budget) {
+        Trip trip = getTripById(tripId, clerkUserId)
+                .orElseThrow(() -> new RuntimeException("Trip not found or unauthorized"));
+        trip.setBudget(budget);
+        
+        // Also invalidate the budget prediction since the budget changed
+        trip.setBudgetPredictionJson(null);
+        
+        return tripRepository.save(trip);
+    }
+
     public Trip duplicateTrip(UUID tripId, String clerkUserId) {
-        // Find the trip to duplicate (could be a template or a user's own trip)
         Trip originalTrip = tripRepository.findById(tripId)
                 .orElseThrow(() -> new RuntimeException("Trip not found"));
 
@@ -86,7 +95,6 @@ public class TripService {
         newTrip.setIsPublic(false);
         newTrip.setIsTemplate(false);
 
-        // Copy itinerary days and activities
         if (originalTrip.getItineraryDays() != null) {
             List<com.tripwise.model.ItineraryDay> clonedDays = originalTrip.getItineraryDays().stream().map(day -> {
                 com.tripwise.model.ItineraryDay newDay = new com.tripwise.model.ItineraryDay();
@@ -109,7 +117,6 @@ public class TripService {
                 }
                 return newDay;
             }).toList();
-            // We can just set them and let cascade take care of it, but we need to ensure the bidirectional relationship is set
             for (com.tripwise.model.ItineraryDay day : clonedDays) {
                 day.setTrip(newTrip);
             }
@@ -123,13 +130,11 @@ public class TripService {
         Trip trip = getTripById(tripId, clerkUserId)
                 .orElseThrow(() -> new RuntimeException("Trip not found or unauthorized"));
         
-        // Clear existing to avoid duplicates if regenerating
         if (trip.getItineraryDays() != null && !trip.getItineraryDays().isEmpty()) {
             itineraryDayRepository.deleteAll(trip.getItineraryDays());
             trip.getItineraryDays().clear();
         }
         
-        // Link bidirectional mapping
         for (com.tripwise.model.ItineraryDay day : itineraryDays) {
             day.setTrip(trip);
             if (day.getActivities() != null) {
@@ -143,17 +148,45 @@ public class TripService {
         return tripRepository.save(trip);
     }
 
+    @Transactional
+    public Trip saveItineraryAndBudget(UUID tripId, String clerkUserId, List<com.tripwise.model.ItineraryDay> itineraryDays, String budgetJson) {
+        Trip trip = getTripById(tripId, clerkUserId)
+                .orElseThrow(() -> new RuntimeException("Trip not found or unauthorized"));
+        
+        if (budgetJson != null) {
+            trip.setBudgetPredictionJson(budgetJson);
+        }
+
+        if (itineraryDays != null) {
+            if (trip.getItineraryDays() != null && !trip.getItineraryDays().isEmpty()) {
+                itineraryDayRepository.deleteAll(trip.getItineraryDays());
+                trip.getItineraryDays().clear();
+            }
+            
+            for (com.tripwise.model.ItineraryDay day : itineraryDays) {
+                day.setTrip(trip);
+                if (day.getActivities() != null) {
+                    for (com.tripwise.model.Activity act : day.getActivities()) {
+                        act.setItineraryDay(day);
+                    }
+                }
+            }
+            
+            trip.getItineraryDays().addAll(itineraryDays);
+        }
+
+        return tripRepository.save(trip);
+    }
+
     public void deleteTrip(UUID tripId, String clerkUserId) {
         Trip trip = getTripById(tripId, clerkUserId)
                 .orElseThrow(() -> new RuntimeException("Trip not found or unauthorized"));
         
-        // Execute bulk deletes for all associated child entities to solve the N+1 delete latency problem
         tripRepository.deleteActivitiesByTripId(tripId);
         tripRepository.deleteItineraryDaysByTripId(tripId);
         tripRepository.deleteExpensesByTripId(tripId);
         tripRepository.deleteTripMediaByTripId(tripId);
         
-        // Finally, delete the trip itself
         tripRepository.deleteTripByTripId(tripId);
     }
 }

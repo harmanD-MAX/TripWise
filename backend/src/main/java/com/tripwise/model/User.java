@@ -13,7 +13,7 @@ public class User {
 
     @Id
     @Column(name = "id", nullable = false, unique = true)
-    private String id; // This will be the Clerk User ID
+    private String id;
 
     @Column(name = "email", nullable = false, unique = true)
     private String email;
@@ -30,7 +30,6 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SavedPlace> savedPlaces;
 
-    // Constructors, Getters, and Setters
 
     public User() {}
 

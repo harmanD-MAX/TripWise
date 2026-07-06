@@ -3,6 +3,8 @@ package com.tripwise.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -31,12 +33,12 @@ public class ItineraryDay {
     private LocalDate date;
 
     @OneToMany(mappedBy = "itineraryDay", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Fetch(FetchMode.SUBSELECT)
     @OrderBy("displayOrder ASC")
     private List<Activity> activities;
 
     public ItineraryDay() {}
 
-    // Getters and Setters
 
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }

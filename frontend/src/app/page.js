@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { UserButton } from "@clerk/nextjs";
 import { auth } from '@clerk/nextjs/server';
-import { ArrowRight, Compass, Sparkles, MapPin, Calendar, Camera, Wallet, CloudSun, Share2 } from 'lucide-react';
+import { ArrowRight, Compass, Sparkles, MapPin, Calendar, Camera, Wallet, CloudSun, Share2, BrainCircuit } from 'lucide-react';
 import Image from 'next/image';
 
 export default async function Home() {
@@ -9,31 +9,22 @@ export default async function Home() {
 
   const features = [
     {
-      title: "Smart Itineraries",
-      description: "Stop spending hours researching. Our engine generates personalized day-by-day plans based on your exact travel style and automatically routes them for the shortest travel time.",
-      icon: <Calendar className="w-7 h-7 text-indigo-400" />,
+      title: "Smart Itinerary Feed",
+      description: "Experience a seamless, auto-scrolling itinerary feed. As you read through your days, the interactive map automatically updates routes and locations without a single click.",
+      icon: <Compass className="w-7 h-7 text-indigo-400" />,
       colorClass: "bg-indigo-500/20 border-indigo-500/30",
-      image: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?q=80&w=2940&auto=format&fit=crop",
-      alt: "Travel planning on a map",
-      bullets: ["AI-curated activities", "Mathematical route optimization", "Drag & drop adjustments"]
-    },
-    {
-      title: "Interactive Mapping",
-      description: "Visualize your entire trip on an interactive map. We plot every hotel, restaurant, and activity so you know exactly where you're going and how to get there.",
-      icon: <MapPin className="w-7 h-7 text-emerald-400" />,
-      colorClass: "bg-emerald-500/20 border-emerald-500/30",
       image: "https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=2948&auto=format&fit=crop",
-      alt: "Travelers navigating a city",
-      bullets: ["Real-time geospatial plotting", "Shortest-path calculations", "Interactive pins"]
+      alt: "Interactive travel map",
+      bullets: ["Intelligent ScrollSpy tracking", "High-res Esri satellite tiles", "Route-flow directional arrows"]
     },
     {
-      title: "Financial Control",
-      description: "A comprehensive budget planner tracks every dollar across accommodation, dining, and activities, ensuring your masterpiece doesn't break the bank.",
-      icon: <Wallet className="w-7 h-7 text-[#1CFEBA]" />,
+      title: "AI Budget Predictor",
+      description: "Don't guess your costs. Our artificial intelligence analyzes your destination, travel style, and duration to predict your exact budget down to the dollar.",
+      icon: <BrainCircuit className="w-7 h-7 text-[#1CFEBA]" />,
       colorClass: "bg-[#1CFEBA]/20 border-[#1CFEBA]/30",
       image: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?q=80&w=2911&auto=format&fit=crop",
       alt: "Calculations and budgeting",
-      bullets: ["Automatic cost estimation", "Visual expense breakdowns", "Currency agnostic"]
+      bullets: ["Machine learning estimations", "One-time API optimization", "Visual expense breakdowns"]
     },
     {
       title: "Meteorological Sync",

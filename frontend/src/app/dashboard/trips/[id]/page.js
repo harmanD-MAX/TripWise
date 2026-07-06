@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, use } from "react";
+import { useEffect, useState, use, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
 import api from "@/lib/axios";
@@ -33,6 +33,7 @@ export default function TripDetailsPage({ params }) {
   const [isSharing, setIsSharing] = useState(false);
   const [isOptimizingTrip, setIsOptimizingTrip] = useState(false);
   const [optimizationSuggestions, setOptimizationSuggestions] = useState(null);
+  const autoGenerateTriggeredRef = useRef(false);
 
   useEffect(() => {
     async function fetchTrip() {
@@ -70,7 +71,8 @@ export default function TripDetailsPage({ params }) {
             .sort((a, b) => (a.dayNumber || a.day_number) - (b.dayNumber || b.day_number));
           setItinerary(uniqueDays);
         } else {
-          if (searchParams.get('autoGenerate') === 'true') {
+          if (searchParams.get('autoGenerate') === 'true' && !autoGenerateTriggeredRef.current) {
+            autoGenerateTriggeredRef.current = true;
             window.history.replaceState({}, '', `/dashboard/trips/${id}`);
             generateAIItinerary(response.data);
           }
@@ -94,20 +96,17 @@ export default function TripDetailsPage({ params }) {
         headers: { Authorization: `Bearer ${token}` }
       });
 
-      let parsedItinerary;
       try {
-        let rawContent = response.data;
-        const startIdx = rawContent.indexOf('[');
-        const endIdx = rawContent.lastIndexOf(']');
-        if (startIdx !== -1 && endIdx !== -1) {
-          rawContent = rawContent.substring(startIdx, endIdx + 1);
+        // The backend now saves BOTH the itinerary and the budget prediction
+        // and returns the fully updated Trip object!
+        const savedTrip = response.data;
+        
+        if (savedTrip && savedTrip.itineraryDays) {
+          setItinerary(savedTrip.itineraryDays);
+          setTrip(savedTrip);
+        } else {
+          throw new Error("Invalid format: backend did not return updated trip");
         }
-        parsedItinerary = JSON.parse(rawContent);
-        setItinerary(parsedItinerary);
-
-        await api.put(`/api/trips/${id}/itinerary`, parsedItinerary, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
 
       } catch (e) {
         console.error("Failed to parse or save AI response:", response.data, e);
@@ -121,6 +120,24 @@ export default function TripDetailsPage({ params }) {
       setIsGenerating(false);
     }
   };
+
+  useEffect(() => {
+    if (!itinerary) return;
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const idx = parseInt(entry.target.getAttribute('data-day-index'), 10);
+          if (!isNaN(idx)) {
+            setSelectedDayIndex(idx);
+          }
+        }
+      });
+    }, { rootMargin: '-20% 0px -60% 0px', threshold: 0 });
+
+    const elements = document.querySelectorAll('.day-scroll-spy');
+    elements.forEach(el => observer.observe(el));
+    return () => observer.disconnect();
+  }, [itinerary]);
 
   if (isLoading) {
     return <div className="flex items-center justify-center min-h-[60vh]"><Loader2 className="h-8 w-8 animate-spin text-gray-500" /></div>;
@@ -227,13 +244,18 @@ export default function TripDetailsPage({ params }) {
         headers: { Authorization: `Bearer ${token}` }
       });
       
-      let rawContent = response.data;
-      const startIdx = rawContent.indexOf('[');
-      const endIdx = rawContent.lastIndexOf(']');
-      if (startIdx !== -1 && endIdx !== -1) {
-        rawContent = rawContent.substring(startIdx, endIdx + 1);
+      let suggestions = response.data;
+      if (typeof suggestions === 'string') {
+        let rawContent = suggestions;
+        const startIdx = rawContent.indexOf('[');
+        const endIdx = rawContent.lastIndexOf(']');
+        if (startIdx !== -1 && endIdx !== -1) {
+          rawContent = rawContent.substring(startIdx, endIdx + 1);
+        }
+        suggestions = JSON.parse(rawContent);
       }
-      setOptimizationSuggestions(JSON.parse(rawContent));
+      
+      setOptimizationSuggestions(suggestions);
     } catch (err) {
       console.error(err);
       alert('Failed to analyze itinerary. Try again.');
@@ -357,13 +379,25 @@ export default function TripDetailsPage({ params }) {
               {itinerary.map((day, originalIdx) => {
                 const displayDayNum = day.day_number || day.dayNumber || originalIdx + 1;
                 day.computedDayNum = displayDayNum; 
-                const isExpanded = selectedDayIndex === originalIdx;
+                const isExpanded = true;
+                const isSelected = selectedDayIndex === originalIdx;
 
                 return (
-                  <div key={originalIdx} className={`glass-panel rounded-[2rem] transition-all duration-500 overflow-hidden ${isExpanded ? 'ring-2 ring-indigo-500/50 shadow-[0_0_30px_rgba(99,102,241,0.15)]' : 'hover:border-white/20'}`}>
+                  <div 
+                    key={originalIdx} 
+                    id={`day-container-${originalIdx}`} 
+                    data-day-index={originalIdx}
+                    className={`day-scroll-spy glass-panel rounded-[2rem] transition-all duration-500 ${isSelected ? 'ring-2 ring-indigo-500/50 shadow-[0_0_30px_rgba(99,102,241,0.15)]' : 'border border-white/5'}`}
+                  >
                     <div
-                      className="px-8 py-6 flex justify-between items-center cursor-pointer group"
-                      onClick={() => setSelectedDayIndex(isExpanded ? null : originalIdx)}
+                      className="px-8 py-6 flex justify-between items-center cursor-pointer group sticky top-4 z-20 bg-[#1A1A1E]/80 backdrop-blur-xl border-b border-white/5 rounded-[2rem] shadow-lg"
+                      onClick={() => {
+                        const el = document.getElementById(`day-container-${originalIdx}`);
+                        if (el) {
+                          const y = el.getBoundingClientRect().top + window.scrollY - 20;
+                          window.scrollTo({ top: y, behavior: 'smooth' });
+                        }
+                      }}
                     >
                       <div>
                         <h3 className="text-2xl font-heading font-black text-white group-hover:text-indigo-400 transition-colors">Day {displayDayNum}</h3>
@@ -384,7 +418,7 @@ export default function TripDetailsPage({ params }) {
                       )}
                     </div>
                     
-                    <div className={`transition-all duration-500 ease-in-out origin-top ${isExpanded ? 'opacity-100 max-h-[2000px] pb-8' : 'opacity-0 max-h-0'}`}>
+                    <div className="opacity-100 pb-8">
                       <div className="px-8 relative">
                         {/* Glowing Timeline Line */}
                         <div className="absolute top-0 bottom-0 left-[2.25rem] w-px bg-gradient-to-b from-indigo-500/50 via-[#1CFEBA]/50 to-indigo-500/50" />
@@ -419,7 +453,18 @@ export default function TripDetailsPage({ params }) {
           <div className="sticky top-28 h-[700px] w-full glass-panel rounded-[2rem] overflow-hidden p-2 flex items-center justify-center relative shadow-2xl">
             {itinerary && itinerary.length > 0 ? (
               <div className="w-full h-full rounded-[1.5rem] overflow-hidden border border-white/5">
-                <MapComponent dayGroups={selectedDayIndex !== null ? [itinerary[selectedDayIndex]] : itinerary} defaultCenter={defaultCenter} />
+                <MapComponent 
+                  dayGroups={selectedDayIndex !== null ? [itinerary[selectedDayIndex]] : itinerary} 
+                  defaultCenter={defaultCenter} 
+                  onDaySelect={(idx) => {
+                    const el = document.getElementById(`day-container-${idx}`);
+                    if (el) {
+                      const y = el.getBoundingClientRect().top + window.scrollY - 20;
+                      window.scrollTo({ top: y, behavior: 'smooth' });
+                    }
+                  }}
+                  selectedDayIndex={selectedDayIndex}
+                />
               </div>
             ) : (
               <div className="text-center p-8 w-full h-full rounded-[1.5rem] bg-black/20 flex flex-col items-center justify-center">
@@ -433,7 +478,7 @@ export default function TripDetailsPage({ params }) {
         </div>
       </div>
 
-      <BudgetPlanner tripId={trip.id} initialBudgetStr={trip.budget} />
+      <BudgetPlanner tripId={trip.id} initialBudgetStr={trip.budget} trip={trip} />
       <MediaGallery tripId={trip.id} />
     </div>
   );

@@ -21,24 +21,20 @@ public class S3Service {
     @Value("${AWS_BUCKET_NAME:}")
     private String bucketName;
 
-    // Use a mock fallback mechanism if AWS isn't configured
     public String uploadFile(MultipartFile file) throws IOException {
         String originalFilename = file.getOriginalFilename();
         String extension = originalFilename != null && originalFilename.contains(".") ? originalFilename.substring(originalFilename.lastIndexOf(".")) : "";
         String uniqueFileName = UUID.randomUUID() + extension;
 
         if (bucketName == null || bucketName.isEmpty()) {
-            // Fallback: Local filesystem upload (simulated AWS)
             Path uploadDir = Paths.get(System.getProperty("user.dir"), "uploads");
             if (!Files.exists(uploadDir)) {
                 Files.createDirectories(uploadDir);
             }
             Path filePath = uploadDir.resolve(uniqueFileName);
             file.transferTo(filePath.toFile());
-            // Return a local URL path
             return "/uploads/" + uniqueFileName;
         } else {
-            // Real AWS S3 Upload (Assuming credentials are automatically picked up by DefaultCredentialsProvider)
             S3Client s3 = S3Client.builder().build();
             PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                     .bucket(bucketName)
@@ -55,13 +51,10 @@ public class S3Service {
         
         try {
             if (bucketName == null || bucketName.isEmpty() || url.startsWith("/uploads/")) {
-                // Local fallback deletion
                 String fileName = url.replace("/uploads/", "");
                 Path filePath = Paths.get(System.getProperty("user.dir"), "uploads", fileName);
                 Files.deleteIfExists(filePath);
             } else {
-                // Real AWS S3 deletion
-                // URL is like: https://tripwise-media-storage.s3.amazonaws.com/uuid.jpg
                 String key = url.substring(url.lastIndexOf("/") + 1);
                 S3Client s3 = S3Client.builder().build();
                 DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()

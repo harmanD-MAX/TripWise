@@ -31,7 +31,7 @@ export default function RootLayout({ children }) {
           </div>
           {/* Global Footer */}
           <footer className="w-full relative z-50 border-t border-white/5 bg-[#141517]/80 backdrop-blur-xl py-8 px-6 lg:px-12 flex flex-col md:flex-row justify-between items-center gap-6 mt-auto">
-            <div className="font-heading font-black text-2xl tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">TripWise</div>
+            <div className="font-heading font-black text-2xl tracking-tighter text-white">TripWise</div>
             <div className="text-xs font-bold uppercase tracking-wider text-gray-500">
               © {new Date().getFullYear()} TripWise. Built for travelers.
             </div>

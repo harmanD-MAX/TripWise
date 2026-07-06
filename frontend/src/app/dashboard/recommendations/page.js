@@ -30,13 +30,17 @@ export default function RecommendationsPage() {
         headers: { Authorization: `Bearer ${token}` }
       });
       
-      let rawContent = res.data;
-      const startIdx = rawContent.indexOf('[');
-      const endIdx = rawContent.lastIndexOf(']');
-      if (startIdx !== -1 && endIdx !== -1) {
-        rawContent = rawContent.substring(startIdx, endIdx + 1);
+      if (typeof res.data === 'object') {
+        setRecommendations(res.data);
+      } else {
+        let rawContent = res.data;
+        const startIdx = rawContent.indexOf('[');
+        const endIdx = rawContent.lastIndexOf(']');
+        if (startIdx !== -1 && endIdx !== -1) {
+          rawContent = rawContent.substring(startIdx, endIdx + 1);
+        }
+        setRecommendations(JSON.parse(rawContent));
       }
-      setRecommendations(JSON.parse(rawContent));
     } catch (err) {
       console.error(err);
       setError("Failed to get recommendations. Please try again.");

@@ -6,11 +6,14 @@ The project uses Next.js for the frontend and Java Spring Boot for the backend A
 
 ## Features
 
-- Itinerary Generation: Connects to Google Gemini to build detailed travel plans based on a user's budget, travel style, and destination. The backend takes the AI's response and structures it into specific days and activities before saving it to the database.
-- Interactive Maps: Uses Leaflet to display the trip visually. The map updates dynamically when you select a specific day in the UI, filtering out other days to show only the relevant routes and coordinate pins for that exact day.
-- Budget Planner: Tracks expenses and categorizes them into groups like Food, Transport, and Lodging. As you log new expenses during your trip, it calculates the remaining budget in real-time so you always know where you stand financially.
-- Media Storage: Allows users to upload flight tickets, hotel reservations, and trip photos directly to their itinerary. The files are securely streamed and stored in an AWS S3 bucket, and the permanent links are saved to the trip in the database.
-- Intelligence Report: A smart analysis feature that reads the generated itinerary and flags potential issues. For example, it might warn you about days with too much walking or suggest cheaper transportation alternatives.
+- **Itinerary Generation**: Connects to Google Gemini to build detailed travel plans based on a user's budget, travel style, and destination. The backend takes the AI's response and structures it into specific days and activities before saving it to the database.
+- **Route Optimization (TSP)**: Features a Traveling Salesperson Problem (TSP) algorithm powered by the OSRM API. Users can click "Optimize Route" on any day's itinerary to automatically reorder activities and minimize overall travel distance.
+- **Interactive Maps**: Uses Leaflet to display the trip visually. The map updates dynamically when you select a specific day in the UI, filtering out other days to show only the relevant routes and coordinate pins. It now features a dynamic **Map Layer Control** allowing users to seamlessly toggle between Satellite, Street Map, Topographic, and Dark Mode styles.
+- **AI Budget Planner**: The system predicts your total expected spend using AI along with generating the itinerary, intelligently displaying the correct local currency based on the destination. It tracks expenses categorized into groups like Food, Transport, and Lodging, calculating the remaining budget in real-time.
+- **Media Storage**: Allows users to upload flight tickets, hotel reservations, and trip photos directly to their itinerary. The files are securely streamed and stored in an AWS S3 bucket.
+- **Intelligence Report & AI Assistant**: A smart analysis feature that reads the generated itinerary and flags potential issues. Includes an interactive AI chat assistant for asking real-time travel questions about the destination.
+- **Live Weather**: Integrated weather widget that pulls real-time climate data for the trip destination.
+- **Trip Templates**: Allows users to save favorite trips as templates and instantly duplicate them for future travel plans.
 
 ## Tech Stack
 

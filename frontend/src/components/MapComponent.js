@@ -1,60 +1,61 @@
 "use client";
 
 import { useEffect, useState, useCallback } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap, Polyline, CircleMarker } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, useMap, Polyline, CircleMarker, FeatureGroup, LayersControl } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
-// Day colors for markers and routes
 const DAY_COLORS = [
-  '#FF3366', // Pink
-  '#1CFEBA', // Green
-  '#FFE81A', // Yellow
-  '#9B51E0', // Purple
-  '#FF8A00', // Orange
-  '#00B4D8', // Cyan
-  '#E63946', // Red
-  '#2A9D8F', // Teal
+  '#FF3366',
+  '#1CFEBA',
+  '#FFE81A',
+  '#9B51E0',
+  '#FF8A00',
+  '#00B4D8',
+  '#E63946',
+  '#2A9D8F',
 ];
 
-// Create colored marker icons
-function createIcon(color) {
-  return L.divIcon({
-    className: 'custom-marker',
-    html: `<div style="
-      width: 28px; height: 28px; 
-      background: ${color}; 
-      border: 3px solid white; 
-      border-radius: 50%; 
-      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-      display: flex; align-items: center; justify-content: center;
-    "></div>`,
-    iconSize: [28, 28],
-    iconAnchor: [14, 14],
-    popupAnchor: [0, -16],
-  });
-}
-
-// Numbered marker for order within a day
 function createNumberedIcon(color, number) {
   return L.divIcon({
     className: 'custom-marker',
     html: `<div style="
-      width: 30px; height: 30px; 
+      position: relative;
+      width: 32px; height: 32px; 
       background: ${color}; 
-      border: 3px solid white; 
-      border-radius: 50%; 
-      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+      border-radius: 50% 50% 50% 0; 
+      transform: rotate(-45deg);
+      box-shadow: -2px 2px 10px rgba(0,0,0,0.5), 0 0 15px ${color}80;
       display: flex; align-items: center; justify-content: center;
-      color: white; font-weight: 800; font-size: 13px; font-family: sans-serif;
-    ">${number}</div>`,
-    iconSize: [30, 30],
-    iconAnchor: [15, 15],
-    popupAnchor: [0, -18],
+      margin-top: -32px;
+      margin-left: -16px;
+    ">
+      <div style="
+        transform: rotate(45deg);
+        color: #1A1A1E; font-weight: 900; font-size: 14px; font-family: sans-serif;
+      ">${number}</div>
+      <div style="
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        border-radius: inherit;
+        box-shadow: 0 0 20px ${color};
+        animation: pulse-glow 2s infinite;
+        z-index: -1;
+      "></div>
+    </div>
+    <style>
+      @keyframes pulse-glow {
+        0% { transform: scale(1); opacity: 0.8; }
+        50% { transform: scale(1.15); opacity: 0; }
+        100% { transform: scale(1); opacity: 0; }
+      }
+    </style>`,
+    iconSize: [32, 32],
+    iconAnchor: [0, 0],
+    popupAnchor: [0, -32],
   });
 }
 
-// Component to fit map bounds to all markers
 function FitBounds({ bounds }) {
   const map = useMap();
   useEffect(() => {
@@ -66,8 +67,50 @@ function FitBounds({ bounds }) {
   return null;
 }
 
-// Component to fetch and display a road route for one day
-function DayRoute({ waypoints, color }) {
+function UpdateCenter({ center }) {
+  const map = useMap();
+  useEffect(() => {
+    if (center && center.length === 2) {
+      map.setView(center, map.getZoom());
+    }
+  }, [map, center]);
+  return null;
+}
+
+function RouteArrows({ routeCoords, color }) {
+  if (!routeCoords || routeCoords.length < 2) return null;
+  const arrows = [];
+  const numArrows = Math.max(1, Math.min(4, Math.floor(routeCoords.length / 10)));
+  const step = Math.floor(routeCoords.length / (numArrows + 1));
+  
+  for (let i = 1; i <= numArrows; i++) {
+    const idx = i * step;
+    if (idx >= routeCoords.length - 1) continue;
+    const p1 = routeCoords[idx];
+    const p2 = routeCoords[idx + 1];
+    
+    const dy = p2[0] - p1[0];
+    const dx = p2[1] - p1[1];
+    const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+    const cssRotation = 90 - angle;
+    
+    const icon = L.divIcon({
+      className: 'route-arrow',
+      html: `<div style="transform: rotate(${cssRotation}deg); width: 14px; height: 14px; display: flex; align-items: center; justify-content: center; opacity: 0.9;">
+        <svg viewBox="0 0 24 24" fill="${color}" width="14" height="14" stroke="#1A1A1E" stroke-width="2">
+          <path d="M12 2L22 22L12 17L2 22L12 2Z" />
+        </svg>
+      </div>`,
+      iconSize: [14, 14],
+      iconAnchor: [7, 7]
+    });
+    
+    arrows.push(<Marker key={idx} position={p1} icon={icon} interactive={false} />);
+  }
+  return <FeatureGroup>{arrows}</FeatureGroup>;
+}
+
+function DayRoute({ waypoints, color, onClick }) {
   const [routeCoords, setRouteCoords] = useState(null);
 
   useEffect(() => {
@@ -78,21 +121,17 @@ function DayRoute({ waypoints, color }) {
 
     async function fetchRoute() {
       try {
-        // OSRM expects lon,lat (not lat,lon)
         const coordsStr = waypoints.map(wp => `${wp[1]},${wp[0]}`).join(';');
         const url = `https://router.project-osrm.org/route/v1/driving/${coordsStr}?overview=full&geometries=geojson`;
         const res = await fetch(url);
         const data = await res.json();
         if (data.routes && data.routes.length > 0) {
-          // GeoJSON coords are [lon, lat], flip to [lat, lon] for Leaflet
           const coords = data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
           setRouteCoords(coords);
         } else {
-          // Fallback to straight lines
           setRouteCoords(waypoints);
         }
       } catch (err) {
-        // Fallback to straight lines on error
         setRouteCoords(waypoints);
       }
     }
@@ -101,10 +140,16 @@ function DayRoute({ waypoints, color }) {
   }, [waypoints]);
 
   if (!routeCoords || routeCoords.length < 2) return null;
-  return <Polyline positions={routeCoords} color={color} weight={4} opacity={0.8} />;
+  return (
+    <FeatureGroup>
+      <Polyline positions={routeCoords} color={color} weight={8} opacity={0.2} eventHandlers={{ click: onClick }} />
+      <Polyline positions={routeCoords} color={color} weight={4} opacity={0.9} eventHandlers={{ click: onClick }} />
+      <RouteArrows routeCoords={routeCoords} color={color} />
+    </FeatureGroup>
+  );
 }
 
-export default function MapComponent({ dayGroups = [], places = [], defaultCenter = [51.505, -0.09] }) {
+export default function MapComponent({ dayGroups = [], places = [], defaultCenter = [51.505, -0.09], onDaySelect, selectedDayIndex }) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -113,7 +158,6 @@ export default function MapComponent({ dayGroups = [], places = [], defaultCente
 
   if (!mounted) return <div className="h-full w-full bg-[#202123] animate-pulse rounded-2xl"></div>;
 
-  // Build markers and routes from dayGroups
   const allMarkers = [];
   const dayRoutes = [];
   const allCoords = [];
@@ -137,7 +181,6 @@ export default function MapComponent({ dayGroups = [], places = [], defaultCente
           }
         }
         if (!coords) {
-          // Fallback: place in a circle around default center
           const angle = actIdx * (Math.PI * 2 / Math.max((day.activities || []).length, 1));
           const radius = 0.02;
           coords = [defaultCenter[0] + Math.cos(angle) * radius, defaultCenter[1] + Math.sin(angle) * radius];
@@ -158,11 +201,10 @@ export default function MapComponent({ dayGroups = [], places = [], defaultCente
       });
 
       if (dayWaypoints.length >= 2) {
-        dayRoutes.push({ waypoints: dayWaypoints, color, uniqueKey: `route-day-${displayDayNum}` });
+        dayRoutes.push({ waypoints: dayWaypoints, color, uniqueKey: `route-day-${displayDayNum}`, originalIdx: dayIdx });
       }
     });
   } else if (places && places.length > 0) {
-    // Fallback: flat places array (legacy)
     places.forEach((place, idx) => {
       let coords = place.coordinates;
       if (!coords || !Array.isArray(coords)) {
@@ -185,17 +227,39 @@ export default function MapComponent({ dayGroups = [], places = [], defaultCente
   return (
     <div className="h-full w-full rounded-2xl overflow-hidden border border-gray-700 shadow-sm z-0">
       <MapContainer 
-        key={defaultCenter.join(',')}
         center={defaultCenter} 
         zoom={13} 
         scrollWheelZoom={true}
         className="h-full w-full"
       >
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
+        <LayersControl position="topright">
+          <LayersControl.BaseLayer checked name="Satellite (Default)">
+            <TileLayer
+              attribution='&copy; <a href="https://www.esri.com/">Esri</a>'
+              url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+            />
+          </LayersControl.BaseLayer>
+          <LayersControl.BaseLayer name="Street Map">
+            <TileLayer
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            />
+          </LayersControl.BaseLayer>
+          <LayersControl.BaseLayer name="Topographic">
+            <TileLayer
+              attribution='Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
+              url="https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png"
+            />
+          </LayersControl.BaseLayer>
+          <LayersControl.BaseLayer name="Dark Mode">
+            <TileLayer
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+              url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+            />
+          </LayersControl.BaseLayer>
+        </LayersControl>
         
+        <UpdateCenter center={defaultCenter} />
         {allCoords.length > 0 && <FitBounds bounds={allCoords} />}
         
         {allMarkers.map((marker, idx) => (
@@ -227,7 +291,14 @@ export default function MapComponent({ dayGroups = [], places = [], defaultCente
         ))}
 
         {dayRoutes.map((route, idx) => (
-          <DayRoute key={route.uniqueKey || idx} waypoints={route.waypoints} color={route.color} />
+          <DayRoute 
+            key={route.uniqueKey || idx} 
+            waypoints={route.waypoints} 
+            color={route.color} 
+            onClick={() => {
+              if (onDaySelect) onDaySelect(route.originalIdx);
+            }} 
+          />
         ))}
       </MapContainer>
 
