@@ -1,97 +1,96 @@
-The goal of this project was to create a clean, full-stack travel planning application that you could actually use to architect highly optimized, personalized itineraries. It handles everything from generating structured day-by-day routes using AI, to tracking budgets and visualizing interactive maps.
+# TripWise ✈️
 
-## How it works (The Architecture
-The whole thing is built using Next.js 16 for the frontend and Java Spring Boot 3 for the backend. I used Spring Security and Clerk because I wanted to handle JWT-based authentication without building a massive custom auth framework.
+TripWise is a comprehensive, full-stack travel planning platform that leverages artificial intelligence to architect highly optimized, personalized itineraries. By analyzing travel constraints such as budget, destination, and personal travel styles, TripWise autonomously constructs structured day-by-day routes and interactive map visualizations to streamline the travel planning process.
 
-When the web client talks to the server, it sends standard REST API requests, securely attaching the Clerk JWT to the Authorization header so the backend can validate who is making the request.
+## 🚀 Key Features
 
-For storing data, I split things into two places:
+*   **Intelligent Itinerary Generation:** Utilizes Google Gemini to automatically generate structured, day-by-day travel plans tailored to user preferences and budgets.
+*   **Interactive Geospatial Mapping:** Features dynamic Leaflet maps with client-side routing and day-specific marker filtering for precise geographical planning.
+*   **Dynamic Budget Management:** Real-time expense categorization (Food, Transport, Lodging) and remaining budget calculations to ensure financial control during the trip.
+*   **Cloud Media Gallery:** Secure, scalable document and image storage integrated directly with AWS S3 for flight tickets, reservations, and travel memories.
+*   **AI Intelligence Report:** Provides automated, high-impact global optimization suggestions (e.g., identifying heavily scheduled days or suggesting transport alternatives).
+*   **Secure Authentication:** Robust JWT-based authentication bridging Clerk on the frontend with Spring Security on the backend.
 
-- **PostgreSQL (Supabase):** This holds all the permanent stuff—user accounts, saved trips, activities, expenses, and media metadata. 
-- **AWS S3:** This acts as a highly scalable object store. It handles all the heavy lifting for the actual travel documents, tickets, and photos users upload to their trips.
+## 💻 Tech Stack
 
-All the different AI generation tasks (like prompting Google Gemini) live in the backend using Spring AI. To keep things clean and responsive, the server constructs constrained JSON blueprints and passes them back to the Next.js client, which handles the UI state and map rendering in the browser.
+### Frontend Architecture
+*   **Framework:** Next.js 16 (React 19)
+*   **Styling:** Tailwind CSS & Glassmorphism UI
+*   **Mapping:** Leaflet & React-Leaflet
+*   **Authentication:** Clerk (Next.js SDK)
 
-## Features
+### Backend Architecture
+*   **Framework:** Java Spring Boot 3
+*   **AI Integration:** Spring AI (Google Gemini integration)
+*   **Security:** Spring Security (JWT Validation)
+*   **Database:** PostgreSQL (Hosted via Supabase)
+*   **Storage:** AWS S3 (Media & Documents)
 
-### Intelligent Itinerary Generation
-If you don't want to manually plan your trip, you shouldn't have to. The backend handles this by taking your budget, destination, and travel style, and passing it through Google Gemini. The server then returns a highly structured, day-by-day itinerary complete with estimated costs, coordinate data, and local insights.
+## 🏗 Architecture Overview
 
-### Interactive Map Routing
-Players... I mean, travelers, can view their entire trip on an interactive Leaflet map. The frontend remembers the geographical coordinates of every activity. I added client-side filtering so that when you expand a specific day in your itinerary, the map instantly updates to show only the pins and routes for that exact day.
+TripWise operates on a decoupled client-server architecture. 
+1.  **Client:** The Next.js web application manages the user interface, interactive map state, and client-side routing.
+2.  **API Gateway & Auth:** The client authenticates via Clerk. Standard REST API requests are dispatched to the backend, securely attaching the Clerk JWT in the `Authorization` header.
+3.  **Server:** The Spring Boot backend validates the token, processes business logic, and interacts with external services (AWS S3 for object storage, Gemini for AI generation).
+4.  **Persistence:** Structured relational data (users, itineraries, expenses, media metadata) is persisted in a remote PostgreSQL database hosted on Supabase.
 
-### Dynamic Budget Tracking
-You can set a total budget for your trip. As you generate activities or manually log expenses in the Budget Planner, the frontend calculates your remaining budget in real-time. Everything is categorized (Food, Transport, Lodging) so you know exactly where your money is going.
+## ⚙️ Local Development Setup
 
-### Trip Media Gallery
-You can also upload your tickets and confirmation documents directly to the trip. The server securely streams your files straight into an AWS S3 bucket and saves the permanent CDN link to Postgres. 
+### Prerequisites
+*   Node.js (v18+)
+*   Java JDK 21
+*   Maven
+*   PostgreSQL (or a Supabase account)
+*   AWS Account (S3 Bucket)
+*   Clerk Account
+*   Google Gemini API Key
 
-### Intelligence Report
-The system analyzes your itinerary and provides a smart "Intelligence Report." This gives you high-impact, global optimization suggestions—like warning you about heavy walking days or suggesting cheaper transport alternatives—so you don't make rookie travel mistakes.
+### Backend Setup
+1. Navigate to the backend directory:
+   ```bash
+   cd backend
+   ```
+2. Create a `.env` file in the root of the `backend` directory:
+   ```env
+   SUPABASE_DB_URL=jdbc:postgresql://<DB_HOST>:5432/postgres
+   SUPABASE_DB_USERNAME=postgres
+   SUPABASE_DB_PASSWORD=<YOUR_PASSWORD>
+   CLERK_ISSUER_URL=https://<YOUR_CLERK_URL>
+   GEMINI_API_KEY=<YOUR_GEMINI_KEY>
+   AWS_BUCKET_NAME=<YOUR_BUCKET>
+   AWS_REGION=<YOUR_REGION>
+   AWS_ACCESS_KEY_ID=<YOUR_KEY>
+   AWS_SECRET_ACCESS_KEY=<YOUR_SECRET>
+   ```
+3. Compile and start the Spring Boot application:
+   ```bash
+   ./mvnw clean package -DskipTests
+   set -a && source .env && set +a
+   ./mvnw spring-boot:run
+   ```
 
-## Testing it out (Local Setup)
-I built this to be run locally if you want to test the entire backend without having to deploy it to AWS every time. If you want to try it out locally on macOS, here is how you set it up.
+### Frontend Setup
+1. Navigate to the frontend directory:
+   ```bash
+   cd frontend
+   ```
+2. Copy the environment variables template:
+   ```bash
+   cp .env.local.example .env.local
+   ```
+3. Populate `.env.local` with your Clerk credentials and set the local API URL:
+   ```env
+   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=<YOUR_KEY>
+   CLERK_SECRET_KEY=<YOUR_SECRET>
+   NEXT_PUBLIC_API_URL=http://localhost:8080
+   ```
+4. Install dependencies and start the development server:
+   ```bash
+   npm install
+   npm run dev
+   ```
+5. Access the application at `http://localhost:3000`.
 
-First, install the backend dependencies using Homebrew:
-```bash
-brew install openjdk@21 maven
-```
+## 📜 License
 
-Make sure you have Node.js installed for the frontend:
-```bash
-brew install node
-```
-
-Set up the database and services (You will need Supabase, Clerk, AWS, and Gemini keys):
-In the backend folder, create your `.env`:
-```env
-SUPABASE_DB_URL=jdbc:postgresql://<DB_HOST>:5432/postgres
-SUPABASE_DB_USERNAME=postgres
-SUPABASE_DB_PASSWORD=<YOUR_PASSWORD>
-CLERK_ISSUER_URL=https://<YOUR_CLERK_URL>
-GEMINI_API_KEY=<YOUR_GEMINI_KEY>
-AWS_BUCKET_NAME=<YOUR_BUCKET>
-AWS_REGION=<YOUR_REGION>
-AWS_ACCESS_KEY_ID=<YOUR_KEY>
-AWS_SECRET_ACCESS_KEY=<YOUR_SECRET>
-```
-
-Compile and run the server:
-```bash
-cd backend
-./mvnw clean package -DskipTests
-set -a && source .env && set +a
-./mvnw spring-boot:run
-```
-
-Run the frontend:
-```bash
-cd frontend
-cp .env.local.example .env.local
-# Add your Clerk keys and set NEXT_PUBLIC_API_URL=http://localhost:8080
-npm install
-npm run dev
-```
-
-## Step-by-Step Test Guide
-Once the server is running on `localhost:8080` and the frontend is on `localhost:3000`, open your browser to `http://localhost:3000`.
-
-**Register & Login**
-1. Click Sign In and use the Clerk popup to create an account.
-2. You'll be redirected to your personal dashboard.
-
-**AI Generation**
-1. Click "New Trip". 
-2. Type in a destination (e.g., Tokyo), select a travel style, and set a budget.
-3. Click "Generate Trip". After a few seconds, the AI will build your entire itinerary and the UI will transition to the Trip Dashboard.
-
-**Map & Itinerary System**
-1. Scroll down to the itinerary list.
-2. Click on "Day 1". Notice how the interactive map on the right collapses all other routes and zooms in perfectly on Day 1's activities.
-
-**Media & Budgeting**
-1. Scroll down to the Media Gallery and click "Upload File". Select a picture from your computer. It will upload to AWS S3 and appear in the grid!
-2. Go to the Budget section and add a manual expense (e.g., "$50 for Sushi"). Watch the progress bar instantly recalculate your remaining trip budget.
-
-## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
