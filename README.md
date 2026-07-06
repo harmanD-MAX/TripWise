@@ -2,7 +2,7 @@
 
 TripWise is a full-stack web application designed to simplify travel planning. Instead of manually mapping out destinations and calculating costs, users can input their preferences and let the system generate a complete day-by-day itinerary.
 
-The project uses Next.js for the frontend and Java Spring Boot for the backend API.
+The project uses Next.js for the frontend and Java Spring Boot for the backend API, and is fully deployed on AWS (Frontend on AWS Amplify, Backend on AWS EC2).
 
 ## Features
 
@@ -20,6 +20,7 @@ Frontend:
 - Tailwind CSS
 - Leaflet Maps
 - Clerk (Authentication)
+- AWS Amplify (Deployment)
 
 Backend:
 - Java Spring Boot 3
@@ -27,6 +28,7 @@ Backend:
 - Spring AI
 - PostgreSQL (Supabase)
 - AWS S3
+- AWS EC2 (Deployment)
 
 
 
