@@ -1,6 +1,6 @@
 The goal of this project was to create a clean, full-stack travel planning application that you could actually use to architect highly optimized, personalized itineraries. It handles everything from generating structured day-by-day routes using AI, to tracking budgets and visualizing interactive maps.
 
-## How it works (The Architecture)
+## How it works (The Architecture
 The whole thing is built using Next.js 16 for the frontend and Java Spring Boot 3 for the backend. I used Spring Security and Clerk because I wanted to handle JWT-based authentication without building a massive custom auth framework.
 
 When the web client talks to the server, it sends standard REST API requests, securely attaching the Clerk JWT to the Authorization header so the backend can validate who is making the request.
