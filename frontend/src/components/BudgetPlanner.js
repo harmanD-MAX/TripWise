@@ -177,7 +177,7 @@ export default function BudgetPlanner({ tripId, initialBudgetStr, trip }) {
       recommendation = {
         icon: <ThumbsUp className="h-8 w-8 text-green-400 mb-2" />,
         title: "Yes, Do It!",
-        text: `You have a comfortable buffer of ${currency}${diff.toFixed(2)}. The expected spend fits nicely within your pocket!`,
+        text: `You have a comfortable buffer of ${currency} ${diff.toFixed(2)}. The expected spend fits nicely within your pocket!`,
         color: "text-green-400",
         bg: "bg-green-500/10",
         border: "border-green-500/30"
@@ -186,7 +186,7 @@ export default function BudgetPlanner({ tripId, initialBudgetStr, trip }) {
       recommendation = {
         icon: <AlertTriangle className="h-8 w-8 text-red-400 mb-2" />,
         title: "Warning: Over Budget",
-        text: `You are projected to be over budget by ${currency}${Math.abs(diff).toFixed(2)}. Consider increasing your budget or looking for cheaper alternatives to make this trip viable.`,
+        text: `You are projected to be over budget by ${currency} ${Math.abs(diff).toFixed(2)}. Consider increasing your budget or looking for cheaper alternatives to make this trip viable.`,
         color: "text-red-400",
         bg: "bg-red-500/10",
         border: "border-red-500/30"
@@ -236,14 +236,14 @@ export default function BudgetPlanner({ tripId, initialBudgetStr, trip }) {
                 </button>
               </div>
             ) : (
-              <h3 className="text-4xl font-black text-white mb-6">{currency}{userBudget.toFixed(2)}</h3>
+              <h3 className="text-4xl font-black text-white mb-6">{currency} {userBudget.toFixed(2)}</h3>
             )}
           </div>
 
           <div className="bg-black/30 p-4 rounded-lg border border-gray-800">
             <p className="text-xs text-gray-400 mb-1">Actual spending so far</p>
             <h4 className="text-2xl font-bold text-white">
-              {currency}{totalSpent.toFixed(2)}
+              {currency} {totalSpent.toFixed(2)}
             </h4>
           </div>
         </div>
@@ -283,7 +283,7 @@ export default function BudgetPlanner({ tripId, initialBudgetStr, trip }) {
             ) : (
               <>
                 <div className="flex items-end gap-3 mb-4 mt-2">
-                  <h3 className="text-4xl font-black text-white">{currency}{expectedSpend.toFixed(2)}</h3>
+                  <h3 className="text-4xl font-black text-white">{currency} {expectedSpend.toFixed(2)}</h3>
                   {userBudget > 0 && expectedSpend > userBudget ? (
                     <span className="flex items-center text-red-400 text-sm font-bold mb-1"><TrendingUp className="h-4 w-4 mr-1" /> Over</span>
                   ) : (
@@ -324,12 +324,12 @@ export default function BudgetPlanner({ tripId, initialBudgetStr, trip }) {
                 </div>
                 <div className="flex gap-2">
                   <div className="relative flex-1">
-                    <span className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-500 text-sm">{currency}</span>
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">{currency}</span>
                     <input
                       type="number"
                       value={expenseInputs[cat]}
                       onChange={(e) => setExpenseInputs(prev => ({ ...prev, [cat]: e.target.value }))}
-                      className="w-full bg-black/40 border border-gray-700 rounded-lg pl-6 pr-2 py-1.5 text-white text-sm focus:outline-none focus:border-green-400"
+                      className="w-full bg-black/40 border border-gray-700 rounded-lg pl-10 pr-2 py-1.5 text-white text-sm focus:outline-none focus:border-green-400"
                       placeholder="0.00"
                     />
                   </div>
@@ -361,7 +361,7 @@ export default function BudgetPlanner({ tripId, initialBudgetStr, trip }) {
                       <h4 className="font-semibold text-white text-sm">{exp.category}</h4>
                     </div>
                     <div className="flex items-center gap-4">
-                      <span className="font-bold text-white text-sm">{currency}{exp.amount.toFixed(2)}</span>
+                      <span className="font-bold text-white text-sm">{currency} {exp.amount.toFixed(2)}</span>
                       <button
                         onClick={() => handleDeleteExpense(exp.id)}
                         className="p-1.5 text-gray-500 hover:text-red-400 hover:bg-red-400/10 rounded transition-colors"
@@ -388,7 +388,7 @@ export default function BudgetPlanner({ tripId, initialBudgetStr, trip }) {
             {/* Inner circle to make it a donut chart */}
             <div className="absolute inset-[15%] bg-[#202123] rounded-full flex flex-col items-center justify-center">
               <span className="text-xs text-gray-500 uppercase tracking-widest font-bold">Total</span>
-              <span className="text-xl font-black text-white">{currency}{totalSpent.toFixed(0)}</span>
+              <span className="text-xl font-black text-white">{currency} {totalSpent.toFixed(0)}</span>
             </div>
           </div>
 
@@ -404,7 +404,7 @@ export default function BudgetPlanner({ tripId, initialBudgetStr, trip }) {
                     <span className="text-gray-300">{cat}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-white font-semibold">{currency}{amount.toFixed(0)}</span>
+                    <span className="text-white font-semibold">{currency} {amount.toFixed(0)}</span>
                     <span className="text-gray-500 text-xs w-8 text-right">{percent}%</span>
                   </div>
                 </div>
