@@ -94,4 +94,4 @@ Once the server is running on `localhost:8080` and the frontend is on `localhost
 2. Go to the Budget section and add a manual expense (e.g., "$50 for Sushi"). Watch the progress bar instantly recalculate your remaining trip budget.
 
 ## License
-Apache License 2.0. See LICENSE for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
