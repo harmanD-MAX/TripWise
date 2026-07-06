@@ -74,7 +74,7 @@ export default async function Home() {
             <div className="flex items-center gap-8">
               <Link href="/" className="flex items-center gap-3 cursor-pointer group">
                 <div className="w-10 h-10 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center group-hover:bg-[#1CFEBA]/10 group-hover:border-[#1CFEBA]/30 transition-all duration-300 backdrop-blur-md shadow-lg">
-                  <Compass className="h-5 w-5 text-white group-hover:text-[#1CFEBA] transition-colors" />
+                  <img src="/logo.svg" alt="TripWise Logo" className="h-6 w-6 rounded-md shadow-sm" />
                 </div>
                 <span className="font-heading font-black text-2xl tracking-tighter text-white">TripWise</span>
               </Link>

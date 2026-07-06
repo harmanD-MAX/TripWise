@@ -4,13 +4,13 @@ TripWise is a full-stack web application designed to simplify travel planning. I
 
 The project uses Next.js for the frontend and Java Spring Boot for the backend API.
 
-## Core Features
+## Features
 
-- Itinerary Generation: Connects to Google Gemini to build detailed travel plans based on a user's budget, style, and location.
-- Interactive Maps: Uses Leaflet to display the trip. The map updates dynamically when you select a specific day to show only the relevant routes and pins.
-- Budget Planner: Tracks expenses and categorizes them (e.g., Food, Transport). It recalculates the remaining budget in real-time as new expenses are added.
-- Media Storage: Allows users to upload tickets and photos. The files are securely stored in AWS S3 and linked to the trip via the database.
-- Intelligence Report: A small feature that reads the generated itinerary and flags potential issues, like days with too much walking.
+- Itinerary Generation: Connects to Google Gemini to build detailed travel plans based on a user's budget, travel style, and destination. The backend takes the AI's response and structures it into specific days and activities before saving it to the database.
+- Interactive Maps: Uses Leaflet to display the trip visually. The map updates dynamically when you select a specific day in the UI, filtering out other days to show only the relevant routes and coordinate pins for that exact day.
+- Budget Planner: Tracks expenses and categorizes them into groups like Food, Transport, and Lodging. As you log new expenses during your trip, it calculates the remaining budget in real-time so you always know where you stand financially.
+- Media Storage: Allows users to upload flight tickets, hotel reservations, and trip photos directly to their itinerary. The files are securely streamed and stored in an AWS S3 bucket, and the permanent links are saved to the trip in the database.
+- Intelligence Report: A smart analysis feature that reads the generated itinerary and flags potential issues. For example, it might warn you about days with too much walking or suggest cheaper transportation alternatives.
 
 ## Tech Stack
 
@@ -28,26 +28,64 @@ Backend:
 - PostgreSQL (Supabase)
 - AWS S3
 
+
+
 ## Local Setup
 
 ### Backend
-1. Go into the backend directory.
-2. Create a `.env` file with the following keys:
-   SUPABASE_DB_URL, SUPABASE_DB_USERNAME, SUPABASE_DB_PASSWORD, CLERK_ISSUER_URL, GEMINI_API_KEY, AWS_BUCKET_NAME, AWS_REGION, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY.
-3. Run the application:
-   ./mvnw clean package -DskipTests
-   set -a && source .env && set +a
-   ./mvnw spring-boot:run
+
+1. Navigate into the backend directory:
+```bash
+cd backend
+```
+
+2. Create a `.env` file in the root of the backend directory with the following keys. You will need to get these values from Supabase, Clerk, Google Gemini, and AWS:
+```env
+SUPABASE_DB_URL=jdbc:postgresql://<DB_HOST>:5432/postgres
+SUPABASE_DB_USERNAME=postgres
+SUPABASE_DB_PASSWORD=<YOUR_PASSWORD>
+CLERK_ISSUER_URL=https://<YOUR_CLERK_URL>
+GEMINI_API_KEY=<YOUR_GEMINI_KEY>
+AWS_BUCKET_NAME=<YOUR_BUCKET>
+AWS_REGION=<YOUR_REGION>
+AWS_ACCESS_KEY_ID=<YOUR_KEY>
+AWS_SECRET_ACCESS_KEY=<YOUR_SECRET>
+```
+
+3. Compile the Java application and start the Spring Boot server:
+```bash
+./mvnw clean package -DskipTests
+set -a && source .env && set +a
+./mvnw spring-boot:run
+```
+The backend API will start running on port 8080.
 
 ### Frontend
-1. Go into the frontend directory.
-2. Copy `.env.local.example` to `.env.local`.
-3. Add your Clerk keys and set `NEXT_PUBLIC_API_URL=http://localhost:8080`.
-4. Install and run:
-   npm install
-   npm run dev
 
-The app will be available at http://localhost:3000.
+1. Open a new terminal and navigate into the frontend directory:
+```bash
+cd frontend
+```
+
+2. Copy the example environment file to create your local config:
+```bash
+cp .env.local.example .env.local
+```
+
+3. Open `.env.local` and add your Clerk public/secret keys. Also make sure the API URL points to your local backend:
+```env
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=<YOUR_CLERK_PUBLISHABLE_KEY>
+CLERK_SECRET_KEY=<YOUR_CLERK_SECRET_KEY>
+NEXT_PUBLIC_API_URL=http://localhost:8080
+```
+
+4. Install the Node dependencies and start the Next.js development server:
+```bash
+npm install
+npm run dev
+```
+
+The web application will now be available in your browser at http://localhost:3000.
 
 ## License
 
