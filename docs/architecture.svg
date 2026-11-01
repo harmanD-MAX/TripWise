@@ -1,0 +1,108 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 640" width="1000" height="640" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#475569"/>
+    </marker>
+    <style>
+      .box{stroke-width:1.5;rx:10;ry:10}
+      .title{font-size:15px;font-weight:600;fill:#0f172a}
+      .sub{font-size:12px;fill:#334155}
+      .zone{font-size:13px;font-weight:700;fill:#475569;letter-spacing:.5px}
+      .lbl{font-size:11px;fill:#475569}
+      .line{stroke:#475569;stroke-width:1.5;fill:none;marker-end:url(#arrow)}
+    </style>
+  </defs>
+
+  <rect width="1000" height="640" fill="#ffffff"/>
+  <text x="500" y="34" text-anchor="middle" font-size="20" font-weight="700" fill="#0f172a">TripWise Architecture</text>
+
+  <!-- User -->
+  <rect class="box" x="40" y="270" width="130" height="70" fill="#f1f5f9" stroke="#64748b"/>
+  <text class="title" x="105" y="300" text-anchor="middle">User</text>
+  <text class="sub" x="105" y="320" text-anchor="middle">Web browser</text>
+
+  <!-- Frontend zone -->
+  <rect x="210" y="70" width="250" height="520" rx="14" fill="#eff6ff" stroke="#93c5fd" stroke-dasharray="6 4"/>
+  <text class="zone" x="335" y="94" text-anchor="middle">FRONTEND · AWS AMPLIFY</text>
+
+  <rect class="box" x="230" y="200" width="210" height="210" fill="#dbeafe" stroke="#3b82f6"/>
+  <text class="title" x="335" y="228" text-anchor="middle">Next.js 16 / React 19</text>
+  <text class="sub" x="335" y="252" text-anchor="middle">Dashboard &amp; trip pages</text>
+  <text class="sub" x="335" y="272" text-anchor="middle">Leaflet map + layer control</text>
+  <text class="sub" x="335" y="292" text-anchor="middle">Budget planner</text>
+  <text class="sub" x="335" y="312" text-anchor="middle">Media gallery</text>
+  <text class="sub" x="335" y="332" text-anchor="middle">Weather widget</text>
+  <text class="sub" x="335" y="352" text-anchor="middle">AI assistant chat</text>
+  <text class="sub" x="335" y="380" text-anchor="middle">Tailwind CSS</text>
+
+  <rect class="box" x="230" y="110" width="210" height="60" fill="#ede9fe" stroke="#8b5cf6"/>
+  <text class="title" x="335" y="136" text-anchor="middle">Clerk</text>
+  <text class="sub" x="335" y="155" text-anchor="middle">Auth · issues JWT</text>
+
+  <rect class="box" x="230" y="440" width="210" height="60" fill="#ecfeff" stroke="#06b6d4"/>
+  <text class="title" x="335" y="466" text-anchor="middle">OSRM API</text>
+  <text class="sub" x="335" y="485" text-anchor="middle">Road route geometry</text>
+
+  <!-- Backend zone -->
+  <rect x="500" y="70" width="250" height="520" rx="14" fill="#f0fdf4" stroke="#86efac" stroke-dasharray="6 4"/>
+  <text class="zone" x="625" y="94" text-anchor="middle">BACKEND · AWS EC2</text>
+
+  <rect class="box" x="520" y="110" width="210" height="70" fill="#dcfce7" stroke="#22c55e"/>
+  <text class="title" x="625" y="138" text-anchor="middle">Spring Security</text>
+  <text class="sub" x="625" y="158" text-anchor="middle">Validates Clerk JWT</text>
+
+  <rect class="box" x="520" y="200" width="210" height="110" fill="#dcfce7" stroke="#22c55e"/>
+  <text class="title" x="625" y="226" text-anchor="middle">REST Controllers</text>
+  <text class="sub" x="625" y="248" text-anchor="middle">Trip · Expense · Media</text>
+  <text class="sub" x="625" y="266" text-anchor="middle">SavedPlace · Search · Weather</text>
+  <text class="sub" x="625" y="284" text-anchor="middle">Assistant · PublicTrip</text>
+
+  <rect class="box" x="520" y="330" width="210" height="130" fill="#dcfce7" stroke="#22c55e"/>
+  <text class="title" x="625" y="356" text-anchor="middle">Services</text>
+  <text class="sub" x="625" y="378" text-anchor="middle">TripService (Spring AI)</text>
+  <text class="sub" x="625" y="396" text-anchor="middle">RoutePlannerService (TSP)</text>
+  <text class="sub" x="625" y="414" text-anchor="middle">AssistantService · ExpenseService</text>
+  <text class="sub" x="625" y="432" text-anchor="middle">S3Service · SearchService</text>
+  <text class="sub" x="625" y="450" text-anchor="middle">WeatherService (cached)</text>
+
+  <rect class="box" x="520" y="480" width="210" height="80" fill="#dcfce7" stroke="#22c55e"/>
+  <text class="title" x="625" y="508" text-anchor="middle">Spring Data JPA</text>
+  <text class="sub" x="625" y="528" text-anchor="middle">Trip · ItineraryDay · Activity</text>
+  <text class="sub" x="625" y="546" text-anchor="middle">Expense · TripMedia · User</text>
+
+  <!-- External services -->
+  <text class="zone" x="875" y="94" text-anchor="middle">EXTERNAL SERVICES</text>
+
+  <rect class="box" x="790" y="190" width="170" height="70" fill="#fef3c7" stroke="#f59e0b"/>
+  <text class="title" x="875" y="219" text-anchor="middle">Google Gemini</text>
+  <text class="sub" x="875" y="239" text-anchor="middle">Itinerary, budget, chat</text>
+
+  <rect class="box" x="790" y="300" width="170" height="70" fill="#fef3c7" stroke="#f59e0b"/>
+  <text class="title" x="875" y="329" text-anchor="middle">Nominatim (OSM)</text>
+  <text class="sub" x="875" y="349" text-anchor="middle">Place search / geocoding</text>
+
+  <rect class="box" x="790" y="400" width="170" height="70" fill="#ffedd5" stroke="#f97316"/>
+  <text class="title" x="875" y="429" text-anchor="middle">AWS S3</text>
+  <text class="sub" x="875" y="449" text-anchor="middle">Tickets, bookings, photos</text>
+
+  <rect class="box" x="790" y="485" width="170" height="70" fill="#e0e7ff" stroke="#6366f1"/>
+  <text class="title" x="875" y="514" text-anchor="middle">PostgreSQL</text>
+  <text class="sub" x="875" y="534" text-anchor="middle">Hosted on Supabase</text>
+
+  <!-- Arrows -->
+  <path class="line" d="M170 305 L228 305"/>
+  <path class="line" d="M140 270 L140 140 L228 140"/>
+  <text class="lbl" x="146" y="132">sign in</text>
+  <path class="line" d="M335 410 L335 438"/>
+  <path class="line" d="M440 255 L518 255"/>
+  <text class="lbl" x="480" y="234" text-anchor="middle">REST /api</text>
+  <text class="lbl" x="480" y="248" text-anchor="middle">+ JWT</text>
+  <path class="line" d="M625 180 L625 198"/>
+  <path class="line" d="M625 310 L625 328"/>
+  <path class="line" d="M625 460 L625 478"/>
+  <path class="line" d="M730 340 L765 340 L765 225 L788 225"/>
+  <path class="line" d="M730 360 L788 360"/>
+  <path class="line" d="M730 435 L788 435"/>
+  <path class="line" d="M730 520 L788 520"/>
+  <text class="lbl" x="738" y="512">JDBC</text>
+</svg>

@@ -33,7 +33,14 @@ Backend:
 - AWS S3
 - AWS EC2 (Deployment)
 
+## Architecture
 
+![TripWise Architecture](docs/architecture.svg)
+
+- The **Next.js frontend** (hosted on AWS Amplify) handles sign-in through Clerk, renders the trip dashboard, and draws road routes on the Leaflet map using the OSRM API.
+- Every API request carries the Clerk JWT, which **Spring Security** on the Spring Boot backend (hosted on AWS EC2) validates before it reaches the REST controllers.
+- The **service layer** calls Google Gemini (through Spring AI) to generate itineraries, budgets and assistant replies, runs the TSP route optimizer, looks up places with Nominatim, and stores uploaded files in AWS S3.
+- Trips, itinerary days, activities, expenses and media metadata are saved through **Spring Data JPA** to PostgreSQL on Supabase.
 
 ## Local Setup
 
